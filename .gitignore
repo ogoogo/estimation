@@ -1,0 +1,14 @@
+*.png
+*.txt
+.DS_Store
+*.csv
+*.dat
+*.project
+*.pydevproject
+horizon.png
+__pycache__
+__pycache__/*
+__*
+*.DS_Store
+simulator/kernel/
+simulator/mice/

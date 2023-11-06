@@ -1,0 +1,7 @@
+*.png
+*.txt
+orbit_equ_output/
+orbit_equ/
+.DS_Store
+configure_consistency/source/
+*.csv
