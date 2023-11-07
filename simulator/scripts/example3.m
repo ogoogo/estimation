@@ -1,8 +1,8 @@
 clear()
 
 % 編集引数
-min_distance = 70000;
-max_distance = 200000;
+min_distance = 900000;
+max_distance = 1000000;
 min_deg = 0;
 max_deg = 90;
 

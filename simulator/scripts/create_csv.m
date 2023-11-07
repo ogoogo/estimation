@@ -1,6 +1,6 @@
 function equ_source_name = create_csv(min_distance, max_distance, min_deg, max_deg, celestial)
 
-equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
+equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance/10000, max_distance/10000, min_deg, max_deg);
 
 
 if exist(equ_source_name,"file") == 0

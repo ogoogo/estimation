@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # 入力CSVファイル
-input_csv="../../output/1102/information1102.csv"
+input_csv="../../output/1109/information.csv"
 
 # 出力ディレクトリ
 output_dir="../../output/1102/informations/"
