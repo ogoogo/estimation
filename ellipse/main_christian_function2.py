@@ -16,41 +16,40 @@ import matplotlib.pyplot
 import estimate_r
 import christian_robinson
 
+def main_christian(ID,date,option,e):
 
-date = "1107"
-ID = 118
-e = 0.1
-# constants
-R_EARTH = 6371E3
+    # date = "1102"
+    # ID = 2
+    # e = 0.1
+    # constants
+    R_EARTH = 6371E3
+
+    # image settings
+    IMAGE_FILE_NAME = '../output/' +str(date)+'/images/raw/' + str(ID) +'.png'
+    D_TRUE = 408+R_EARTH # true distance to Earth [m]
+
+    # set sun earth direction (TODO: ephemeris-based approach)
+    u = np.array([1,0])
+
+    # number of illumination scan lines
+    m = 100 # number of illumination scan lines across image
+
+    # processing settings
+    step_size = 2 # image scan step size
+    window_radius = 4 # Sobel window size
+    zernike_radius = 4 # Zernike moment size (NOTE: cannot be larger than window_size) 
+    sigma_psf = 0.2 # pixel point spread function
+    d_min = 100 # usually 5*radius_px_body/100
+    N_T = 500 # maximum RANSAC tests
+    shape = 1 # hyperbola = 0, ellipse = 1
+    line_thickness = 1 # pixel line fit thinkness
+    bright_thresh = 100 # bright pixel threshold
+
+    # algorithm parameter
+    gradient_ratio = 0.6
+    direction_ratio = 0.3
 
 
-
-# image settings
-IMAGE_FILE_NAME = '../output/'+str(date)+'/images/raw/' + str(ID) +'.png'
-D_TRUE = 408+R_EARTH # true distance to Earth [m]
-
-# set sun earth direction (TODO: ephemeris-based approach)
-u = np.array([1,0])
-
-# number of illumination scan lines
-m = 100 # number of illumination scan lines across image
-
-# processing settings
-step_size = 2 # image scan step size
-window_radius = 4 # Sobel window size
-zernike_radius = 4 # Zernike moment size (NOTE: cannot be larger than window_size) 
-sigma_psf = 0.2 # pixel point spread function
-d_min = 100 # usually 5*radius_px_body/100
-N_T = 500 # maximum RANSAC tests
-shape = 1 # hyperbola = 0, ellipse = 1
-line_thickness = 1 # pixel line fit thinkness
-bright_thresh = 100 # bright pixel threshold
-
-# algorithm parameter
-gradient_ratio = 0.6
-direction_ratio = 0.3
-
-if __name__ == "__main__":
 
     # CSVファイルのパスを指定
     csv_file_path = "../output/" + str(date) + "/information.csv"
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     u = values/dis
 
     f_answer = np.array(row[44:50])
-    print(f_answer)
+    # print(f_answer)
 
     # 結果を表示
     print("取得した値:", u)
@@ -273,15 +272,22 @@ if __name__ == "__main__":
         N_test = N_test + 1
         
         # random sample of points
-        m = random.sample(range(pos),6)
+        # m = random.sample(range(pos),6)
         
         # determine fit
-        if shape == 0:
-            f = curve_fitting_tools.fitzgibbon_hyp_fit(edge[m,1], edge[m,0])
-        else:
+        # if shape == 0:
+        #     f = curve_fitting_tools.fitzgibbon_hyp_fit(edge[m,1], edge[m,0])
+        # else:
+        #     f = curve_fitting_tools.fitzgibbon_fit(edge[:,1], edge[:,0])
+        #     # f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
+        #     # f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e)
+
+        if option == "fitz":
             f = curve_fitting_tools.fitzgibbon_fit(edge[:,1], edge[:,0])
-            # f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
-            # f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e)
+        elif option == "e":
+            f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
+        else:
+            raise ValueError("option is wrong")
         
         # check distance with all points
         N_k = 0
@@ -309,10 +315,10 @@ if __name__ == "__main__":
     edge = edge[elem,:]
     if shape == 0:
         f = curve_fitting_tools.fitzgibbon_hyp_fit(edge[:,1], edge[:,0])
+    elif option == "e":
+        f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
     else:
-        f = curve_fitting_tools.fitzgibbon_fit(edge[:,1], edge[:,0])
-        # f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
-        # f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e)
+        raise ValueError("option is wrong")
     # print(f.tolist())
     # print(row.tolist())
     # print(df)
@@ -351,6 +357,7 @@ if __name__ == "__main__":
     y_ans = plt_ans.collections[0].get_paths()[0].vertices[:,1] 
     # print(x)
 
+
     for i in range(0,len(x_ans)):
         if int(y_ans[i]) >= height-1 or int(y_ans[i]) <= 0 or \
             int(x_ans[i]) >= width-1 or int(x_ans[i]) <= 0:
@@ -362,7 +369,6 @@ if __name__ == "__main__":
             int(x[i]) >= width-1 or int(x[i]) <= 0:
             continue
         original_image = insert_pixel(original_image,x[i],y[i],(255,0,0),line_thickness)
-
 
     # calculate error
     d_err = np.zeros(N_k)
@@ -377,7 +383,7 @@ if __name__ == "__main__":
     print("line fit error : " + str(d_std) + " px")
     
     # draw images
-    original_image.show()
+    # original_image.show()
     original_image.save("../output/" + str(date) + "/images/fitted/" + str(ID) + ".png")
 
 
@@ -400,9 +406,9 @@ if __name__ == "__main__":
     # print(y2)
     x2 = x2- x0
     y2 = y2 - y0
-    print(x2)
+    # print(x2)
     m2 = x2.shape
-    print(m2)
+    # print(m2)
     f_column = np.full((m2[0], 1), 50*494/3.66)
     # print(f_column)
     x2 = np.array(x2).reshape(-1, 1)
@@ -419,6 +425,7 @@ if __name__ == "__main__":
         df[72] = 0
         df[73] = 0
     df.iloc[ID-1,71:74] = r
-    
+
     df.to_csv(csv_file_path, index=False, header=False)     
     # estimate_r.estimate_r(f)
+    return r

@@ -5,7 +5,7 @@ def christian_robinson(s):
     R = 1737.4
     D = np.array([[1/R, 0, 0],[0, 1/R, 0], [0, 0, 1/R]])
     n,m = s.shape
-    print(m,n)
+    # print(m,n)
     H = np.zeros((m, 3))
     for i in range(m):
         H[i, :] = (np.dot(D, s[:, i])).T
@@ -22,11 +22,11 @@ def christian_robinson(s):
     ones_column = np.ones((m, 1))
     augmented_H = np.hstack((H, ones_column))
     augmented_H = np.array(augmented_H)
-    print(augmented_H)
+    # print(augmented_H)
     _, S, V = np.linalg.svd(augmented_H, full_matrices=False)
     n = -V[3, 0:3] / V[3, 3]
-    print(V)
-    print(n)
+    # print(V)
+    # print(n)
     if np.dot(H[0, :3], n) > 0:
         n = -n
 

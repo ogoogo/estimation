@@ -41,7 +41,8 @@ def fitzgibbon_hyp_fit(x,y):
         A1 = V[:,2]
     else:
         print("Fitzgibbon hyperbola failed")
-        exit()
+        raise ValueError("error!")
+        # exit()
     A2 = np.matmul(T,A1)
     
     return np.concatenate((A1,A2))
@@ -89,7 +90,8 @@ def fitzgibbon_fit(x,y):
         A1 = V[:,2]
     else:
         print("Fitzgibbon failed")
-        exit()
+        raise ValueError("error!")
+        # exit()
     A2 = np.matmul(T,A1)
     
     # determine ellipse parameters

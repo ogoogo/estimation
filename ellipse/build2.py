@@ -12,17 +12,21 @@ import random
 import matplotlib.pyplot
 import estimate_r
 import christian_robinson
+import r2e
+import main_christian_function2
 
 date = "1107"
-ID =350
+ID =62
 for i in range(400):
     # print(i)
     try :
 
-        main_christian_function.main_christian(ID,date)
-        print(str(ID)+"枚目")
+        r = main_christian_function2.main_christian(ID,date,"e",0.1)
+        # r2e.r2e(r)
+        
     except Exception as e:
         print(e)
+    print(str(ID)+"枚目")
         
     
     ID += 1

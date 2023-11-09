@@ -35,15 +35,17 @@ def fitzgibbon_fit(x,y,e):
     if w[0] < 0 and (4*V[0,0]*V[2,0] - V[1,0]**2) > 0 and \
         (w[1] > 0 or w[0] > w[1]) and (w[2] > 1 or w[0] > w[2]):
         A1 = V[:,0]
+        print("1が選ばれた")
     elif w[1] < 0 and (4*V[0,1]*V[2,1] - V[1,1]**2) > 0 and \
         (w[2] > 1 or w[1] > w[2]):
         A1 = V[:,1]
+        print("2が選ばれた")
     elif w[2] < 0 and (4*V[0,2]*V[2,2] - V[1,2]**2) > 0:
         A1 = V[:,2]
+        print("3が選ばれた")
     else:
-        print("Fitzgibbon failed")
-        exit()
-    # A1 = V[:,0]
+        raise ValueError("Fitzgibbon failed")
+    # A1 = V[:,2]
     
     A2 = np.matmul(T,A1)
     
@@ -55,9 +57,11 @@ def fitzgibbon_fit(x,y,e):
     e = A2[1]
     f = A2[2]
 
-    print((2*((a-c)**2 + b**2)**0.5) / (((a-c)**2 + b**2)**0.5 + a + c))
+    print("aCa")
+    print(np.dot(A1,np.dot(C,A1)))
+    # print((2*((a-c)**2 + b**2)**0.5) / (((a-c)**2 + b**2)**0.5 + a + c))
 
-    print(a,b,c)
+    # print(a,b,c)
     x_c = (2*c*d - b*e)/(b*b - 4*a*c) 
     y_c = (2*a*e - b*d)/(b*b - 4*a*c)
     major = np.sqrt(2*(a*e*e + c*d*d + f*b*b - b*d*e - a*c*f) / \
