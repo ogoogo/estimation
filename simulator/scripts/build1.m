@@ -9,7 +9,7 @@ function build1(min_distance,max_distance, min_deg, max_deg, n)
 situation = "mac";
 celestial = "moon";
 
-output_name = "../../output/1107/information.csv";
+output_name = "../../output/1113/information.csv";
 
 path_setting(situation)
 

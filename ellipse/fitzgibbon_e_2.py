@@ -59,7 +59,8 @@ def fitzgibbon_fit(x,y,e):
 
     print("aCa")
     print(np.dot(A1,np.dot(C,A1)))
-    # print((2*((a-c)**2 + b**2)**0.5) / (((a-c)**2 + b**2)**0.5 + a + c))
+    print("e^2")
+    print((2*((a-c)**2 + b**2)**0.5) / (((a-c)**2 + b**2)**0.5 + a + c))
 
     # print(a,b,c)
     x_c = (2*c*d - b*e)/(b*b - 4*a*c) 

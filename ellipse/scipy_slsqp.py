@@ -18,17 +18,17 @@ def slsqp(x,y,e):
         D[i,5] = 1
     C = np.array([[0, 0, 2,0,0,0], [0, -1, 0,0,0,0],[2, 0, 0, 0, 0, 0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]],dtype=np.float64)
     e_calc = (2-e**2)**2-e**4
-    B = np.array([[e_calc, 0, -e_calc,0,0,0], [0, (2-e**2)**2, 0,0,0,0],[-e_calc, 0, e_calc, 0, 0, 0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]],dtype=np.float64)
+    B = np.array([[(2-e**2)**2-e**4, 0, -(2-e**2)**2-e**4,0,0,0], [0, (2-e**2)**2, 0,0,0,0],[-(2-e**2)**2-e**4, 0, (2-e**2)**2-e**4, 0, 0, 0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0]],dtype=np.float64)
 
 
     # 目的関数の定義
     def objective_function(a):
-        sum = 0
-        for i in range(0,num):
-            sum += a[0]*x[i]**2 + a[1]*x[i]*y[i] + a[2]*y[i]**2 + a[3]*x[i] + a[4]*y[i] + a[5]
+        # sum = 0
+        # for i in range(0,num):
+        #     sum += a[0]*x[i]**2 + a[1]*x[i]*y[i] + a[2]*y[i]**2 + a[3]*x[i] + a[4]*y[i] + a[5]
         
-        return sum
-        # return np.dot(a.T, np.dot(D.T, np.dot(D, a))) 
+        # return sum
+        return np.dot(a, np.dot(D.T, np.dot(D, a))) 
 
     # 制約条件
     def constraint1(a):
@@ -41,16 +41,16 @@ def slsqp(x,y,e):
         # build design and constraint matrix
 
         # return np.dot(a.T, np.dot(D.T, np.dot(D, a)) + l1*(1 - np.dot(a.T, np.dot(C, a)) ) + l2*np.dot(a.T, np.dot(B, a)))
-        return np.dot(a.T, np.dot(B, a))
+        return np.dot(a, np.dot(B, a))
 
 
 
     # 初期値と制約条件を設定
-    a0 = np.array([1000,50,1000,1,1,-1000], dtype=np.float64)
+    a0 = np.array([0.1,0.1,1,1,1,1], dtype=np.float64)
     # constraints = ({'type': 'eq', 'fun': constraint1},
     #             {'type': 'eq', 'fun': constraint2})
 
-    constraints = ({'type': 'eq', 'fun': constraint1})
+    constraints = ({'type': 'eq', 'fun': constraint2})
     # ラグランジュの未定乗数法を使って最適化問題を解く
     result = minimize(objective_function, a0, constraints=constraints, method='SLSQP')
 
@@ -63,4 +63,5 @@ def slsqp(x,y,e):
     d = result.x[3]
     e = result.x[4]
     f = result.x[5]
+    # print(np.array([a, b, c, d, e, f]))
     return np.array([a, b, c, d, e, f])

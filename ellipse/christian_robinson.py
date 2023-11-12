@@ -24,6 +24,7 @@ def christian_robinson(s):
     augmented_H = np.array(augmented_H)
     # print(augmented_H)
     _, S, V = np.linalg.svd(augmented_H, full_matrices=False)
+    print(V)
     n = -V[3, 0:3] / V[3, 3]
     # print(V)
     # print(n)

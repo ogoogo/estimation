@@ -14,22 +14,22 @@ import estimate_r
 import christian_robinson
 import r2e
 import main_christian_function2
-import main_christian_function_shou
 
 date = "1102"
-ID =2
+ID =3
 for i in range(1):
-    r = main_christian_function2.main_christian(ID,date,"slsqp",0)
-    r2e.r2e(r)
+    # r = main_christian_function2.main_christian(ID,date,"slsqp",0.8)
+    # r2e.r2e(r)
     # print(i)
-    # try :
+    try :
 
-    #     r = main_christian_function2.main_christian(ID,date,"slsqp",0.5)
-    #     # r2e.r2e(r)
+        r = main_christian_function2.main_christian(ID,date,"fitz",0)
+        e = r2e.r2e(r)
+        r = main_christian_function2.main_christian(ID,date,"slsqp",e)
         
-    # except Exception as e:
-    #     print(e)
-    # print(str(ID)+"枚目")
+    except Exception as e:
+        print(e)
+    print(str(ID)+"枚目")
         
     
     ID += 1

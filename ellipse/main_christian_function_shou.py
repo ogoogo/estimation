@@ -43,7 +43,8 @@ def main_christian(ID,date,option,e):
     N_T = 500 # maximum RANSAC tests
     shape = 1 # hyperbola = 0, ellipse = 1
     line_thickness = 1 # pixel line fit thinkness
-    bright_thresh = 100 # bright pixel threshold
+    bright_thresh = 70 # bright pixel threshold
+    gap_thresh = 3
 
     # algorithm parameter
     gradient_ratio = 0.6
@@ -61,8 +62,8 @@ def main_christian(ID,date,option,e):
     row = df.iloc[ID-1]  # インデックスは0から始まるため
 
     # 10番目と11番目の値を取得し、配列に格納
-    value_10 = -row[29]  # インデックスは0から始まるため
-    value_11 = -row[30]
+    value_10 = row[29]  # インデックスは0から始まるため
+    value_11 = row[30]
     values = np.array([value_10, value_11])
     dis = np.linalg.norm(values)
     u = values/dis
@@ -78,7 +79,8 @@ def main_christian(ID,date,option,e):
 
     # read image from file and convert to black and white
     original_image = Image.open(IMAGE_FILE_NAME).convert('RGB')
-    image = np.array(Image.open(IMAGE_FILE_NAME).convert('L'))
+    image_ = np.array(Image.open(IMAGE_FILE_NAME).convert('L'))
+    image = image_[2:496, 2:661]
     height, width = image.shape
     
     def insert_pixel(image,x,y,color,size):
@@ -91,7 +93,7 @@ def main_christian(ID,date,option,e):
                 if int(y)+j >= height-1 or int(y)+j <= 0 or \
                     int(x)+i >= width-1 or int(x)+i <= 0:
                     continue
-                image.putpixel((int(x)+i,int(y)+j), color)
+                image.putpixel((int(x)+i+2,int(y)+j+2), color)
     
         return image
     
@@ -102,7 +104,8 @@ def main_christian(ID,date,option,e):
     # image = image.astype(npbright_thresh32)
     
     # determine bright pixel threshold
-    bright_thresh = 100
+    # bright_thresh = 70
+    # gap_thresh = 5
     
     # generate horizon scan lines
     b = np.array([[1,0],[-1,0],[0,1],[0,-1]])
@@ -130,25 +133,43 @@ def main_christian(ID,date,option,e):
                 
                 # move along the strip and break if suspected limb
                 count = 0
+                flag = 0
                 while y < height and y >= 0 and x < width and x >= 0:
                     
-                    # might be a limb, increase counter
-                    if image[y,x] > bright_thresh:
-                        count = count + 1
+                    # # might be a limb, increase counter
+                    # if image[y,x] > bright_thresh:
+                    #     count = count + 1
                     
-                    # this could be a limb, hence include in measured position
-                    if count > window_radius:
-                        y = y - int(window_radius*step_size*u[1])
-                        x = x - int(window_radius*step_size*u[0])
+                    # # this could be a limb, hence include in measured position
+                    # if count > window_radius:
+                    #     y = y - int(window_radius*step_size*u[1])
+                    #     x = x - int(window_radius*step_size*u[0])
+                    #     edge[pos,0] = np.float64(y)
+                    #     edge[pos,1] = np.float64(x)
+                        
+                    #     pos = pos + 1
+                    #     break
+                    # print(image[x,y])
+                    if flag == 0:
+                        if image[y,x] > bright_thresh:
+                            edge[pos,0] = np.float64(y)
+                            edge[pos,1] = np.float64(x)
+                            pos = pos + 1
+                            break
+                        flag = 1
+                    elif (int(image[y,x]) - int(image[y_old,x_old])) > gap_thresh:
                         edge[pos,0] = np.float64(y)
                         edge[pos,1] = np.float64(x)
-                        
                         pos = pos + 1
                         break
-                    
+      
                     # increase along strip
+                    y_old = y
+                    x_old = x
+                    # print(x_old,y_old)
                     y = y + int(step_size*u[1])
                     x = x + int(step_size*u[0])
+                    # print(x,y)
                     
     
     # reduce suspected positions to pos
@@ -360,18 +381,18 @@ def main_christian(ID,date,option,e):
     y_ans = np.arange(0,height,1)
     x_ans,y_ans = np.meshgrid(x_ans,y_ans)
 
-    z_ans = f_answer[0]*(x_ans)**2 + f_answer[1]*(x_ans)*(y_ans) + f_answer[2]*(y_ans)**2 + f_answer[3]*(x_ans) + f_answer[4]*(y_ans) + f_answer[5]
-    plt_ans = matplotlib.pyplot.contour(z_ans,[0])
-    x_ans = plt_ans.collections[0].get_paths()[0].vertices[:,0] 
-    y_ans = plt_ans.collections[0].get_paths()[0].vertices[:,1] 
+    # z_ans = f_answer[0]*(x_ans)**2 + f_answer[1]*(x_ans)*(y_ans) + f_answer[2]*(y_ans)**2 + f_answer[3]*(x_ans) + f_answer[4]*(y_ans) + f_answer[5]
+    # plt_ans = matplotlib.pyplot.contour(z_ans,[0])
+    # x_ans = plt_ans.collections[0].get_paths()[0].vertices[:,0] 
+    # y_ans = plt_ans.collections[0].get_paths()[0].vertices[:,1] 
     # print(x)
 
 
-    for i in range(0,len(x_ans)):
-        if int(y_ans[i]) >= height-1 or int(y_ans[i]) <= 0 or \
-            int(x_ans[i]) >= width-1 or int(x_ans[i]) <= 0:
-            continue
-        original_image = insert_pixel(original_image,x_ans[i],y_ans[i],(0,255,0),line_thickness)  
+    # for i in range(0,len(x_ans)):
+    #     if int(y_ans[i]) >= height-1 or int(y_ans[i]) <= 0 or \
+    #         int(x_ans[i]) >= width-1 or int(x_ans[i]) <= 0:
+    #         continue
+    #     original_image = insert_pixel(original_image,x_ans[i],y_ans[i],(0,255,0),line_thickness)  
 
     for i in range(0,len(x)):
         if int(y[i]) >= height-1 or int(y[i]) <= 0 or \

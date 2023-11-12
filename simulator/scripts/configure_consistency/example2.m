@@ -90,7 +90,7 @@ writematrix(dcm_moon,"./../moondcm.txt", 'Delimiter',',')
 
 
 id = 1;
-inforow = [id, et, r_equ, l_moon, l_sun, dcm(1,:), dcm(2,:), dcm(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp];
+inforow = [id, et, r_equ, l_moon, l_sun, dcm(1,:), dcm(2,:), dcm(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, dcm_moon];
 
 writematrix(inforow,"./../inforow.txt", 'Delimiter',',')
 

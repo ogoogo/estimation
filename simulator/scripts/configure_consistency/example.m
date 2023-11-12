@@ -1,6 +1,6 @@
 clear()
 
-
+celestial = "moon";
 % et    = cspice_str2et('2023 April 12, 11:39:36 UTC');
 et    = cspice_str2et('2022 December 18, 21:11:11 UTC');
 % et2 = et-1500;
@@ -41,6 +41,15 @@ sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
 l_moon = moon(1:3).';
 l_sun = sun(1:3).';
 
+if celestial == "moon"
+    l_cele = l_moon;
+else
+    l_cele = [0,0,0];
+
+end
+
+
+
 dcm = inv(cspice_q2m(q));
 
 
@@ -69,10 +78,14 @@ disp(dlp_dcm)
 dlp_dcm2 = cspice_rotmat(dlp_dcm,deg2rad(-0.63),1);
 dlp_dcm3 = cspice_rotmat(dlp_dcm2,deg2rad(-0.023),3);
 
+dlp_dcm4 = cspice_rotmat(dlp_dcm3,-pi/2,1);
 
 % dlpから見た太陽方向
-sun_dlp = l_sun*dlp_dcm3';
+sun_dlp = l_sun*dlp_dcm4';
 % disp(sun_dlp)
+
+cele_dlp = l_cele*dlp_dcm4';
+
 
 % 月の座標変換
 moon_i = l_moon/norm(l_moon);
@@ -102,8 +115,9 @@ writematrix(dcm_moon,"./../moondcm.txt", 'Delimiter',',')
 
 
 id = 1;
-inforow = [id, et, r_equ, l_moon, l_sun, dcm(1,:), dcm(2,:), dcm(3,:), dlp_dcm3(1,:), dlp_dcm3(2,:), dlp_dcm3(3,:), sun_dlp,  dcm_moon];
+inforow = [id, et, r_equ, l_moon, l_sun, dcm(1,:), dcm(2,:), dcm(3,:), dlp_dcm3(1,:), dlp_dcm3(2,:), dlp_dcm3(3,:), sun_dlp,  dcm_moon, cele_dlp, zeros(1,12),dlp_dcm4(1,:),dlp_dcm4(2,:),dlp_dcm4(3,:)];
 
+writematrix(inforow, "../../../output/1112/information.csv", 'WriteMode', 'append')
 writematrix(inforow,"./../inforow.txt", 'Delimiter',',')
 
 

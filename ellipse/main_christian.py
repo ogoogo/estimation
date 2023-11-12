@@ -17,8 +17,8 @@ import estimate_r
 import christian_robinson
 
 
-date = "1107"
-ID = 0
+date = "1112"
+ID = 1
 e = 0.1
 # constants
 R_EARTH = 6371E3
