@@ -2,6 +2,10 @@ clear()
 date = "1114";
 celestial = "moon";
 
+f = 50;
+phi = atan(0.494*7.4/2/f);
+k = 1000000*tan(phi);
+
 fileName = "../output/"+date + "/information_fitz.csv";
 M1 = readmatrix(fileName);
 
@@ -26,6 +30,10 @@ data1 = createData(M1);
 data2 = createData(M2);
 data3 = createData(M3);
 
+data1 = filterData(data1);
+data2 = filterData(data2);
+data3 = filterData(data3);
+
 
 
 
@@ -43,6 +51,7 @@ xlim([0,180])
 ylim([0,1000000])
 zlim([0,max([max(data1(2,:)),max(data2(2,:)),max(data3(2,:))])])
 % zlim([0,20])
+zlim([0,0.2])
 title("sun-camera angular - true distance - error")
 xlabel("sun-camera angular(deg)")
 ylabel("true distance")
@@ -56,11 +65,11 @@ hold on
 scatter(data3(1,:), data3(2,:), 10, 'green','filled')
 legend('ellipse constraint', 'e=0 constraint','e constraint','AutoUpdate','off')
 grid on;
-% yline(0)
+yline(0.034)
 xlim([0,180])
 % ylim([0,1000000])
 ylim([0,max([max(data1(2,:)),max(data2(2,:)),max(data3(2,:))])])
-% ylim([0,20])
+ylim([0,0.2])
 title("sun-camera angular - error")
 xlabel("sun-camera angular(deg)")
 ylabel("error(deg)")
@@ -73,10 +82,11 @@ hold on
 scatter(data3(3,:), data3(2,:), 10, 'green','filled')
 legend('ellipse constraint', 'e=0 constraint','e constraint','AutoUpdate','off')
 grid on;
-% yline(0)
+yline(0.034)
 xlim([0,1000000])
 ylim([0,max([max(data1(2,:)),max(data2(2,:)),max(data3(2,:))])])
 % ylim([0,20])
+ylim([0,0.2])
 title("true-distance - error")
 xlabel("true distance(km)")
 ylabel("error(deg)")
@@ -92,6 +102,7 @@ grid on;
 yline(0)
 limit = max([max(abs(data1(4,:))),max(abs(data2(4,:))),max(abs(data3(4,:)))]);
 ylim([-limit, limit])
+ylim([-20000,20000])
 title("x Error")
 xlabel("true distance (km)")
 ylabel("x error (km)")
@@ -107,6 +118,7 @@ grid on;
 yline(0)
 limit = max([max(abs(data1(5,:))),max(abs(data2(5,:))),max(abs(data3(5,:)))]);
 ylim([-limit, limit])
+ylim([-20000,20000])
 title("y Error")
 xlabel("true distance (km)")
 ylabel("y error (km)")
@@ -122,60 +134,26 @@ grid on;
 yline(0)
 limit = max([max(abs(data1(6,:))),max(abs(data2(6,:))),max(abs(data3(6,:)))]);
 ylim([-limit, limit])
+ylim([-1000000,1000000])
 title("z Error")
 xlabel("true distance (km)")
 ylabel("z error (km)")
 
 
 
-saveas(1, '../output/graph/normal_all_existed/sun-cam_true-z_error.png')
-saveas(2, '../output/graph/normal_all_existed/sun-cam_error.png')
-saveas(3, '../output/graph/normal_all_existed/true-z_error.png')
-saveas(4, '../output/graph/normal_all_existed/true-z_x.png')
-saveas(5, '../output/graph/normal_all_existed/true-z_y.png')
-saveas(6, '../output/graph/normal_all_existed/true-z_z.png')
+% saveas(1, '../output/graph/normal_filterd/sun-cam_true-z_error.png')
+% saveas(2, '../output/graph/normal_filterd/sun-cam_error.png')
+% saveas(3, '../output/graph/normal_filterd/true-z_error.png')
+% saveas(4, '../output/graph/normal_filterd/true-z_x.png')
+% saveas(5, '../output/graph/normal_filterd/true-z_y.png')
+% saveas(6, '../output/graph/normal_filterd/true-z_z.png')
+
+saveas(1, '../output/graph/normal_filtered_limit/sun-cam_true-z_error.png')
+saveas(2, '../output/graph/normal_filtered_limit/sun-cam_error.png')
+saveas(3, '../output/graph/normal_filtered_limit/true-z_error.png')
+saveas(4, '../output/graph/normal_filtered_limit/true-z_x.png')
+saveas(5, '../output/graph/normal_filtered_limit/true-z_y.png')
+saveas(6, '../output/graph/normal_filtered_limit/true-z_z.png')
 
 
 
-
-% 
-% function data =  makeData(date,filename,celestial)
-% fileName = "../output/"+date + filename;
-% M = readmatrix(fileName);
-% [row,col] = size(M);
-% rows = M(:, 72) ~= 0;
-% 
-% m = M(rows,:);
-% [rows2,col] = size(m);
-% 
-% 
-% data = zeros(2,rows2);
-% for i = 1:rows2
-%     r_correct = m(i,42:44);
-%     r_estimate = m(i,72:74);
-%     radError = acos(dot(r_correct,r_estimate)/(norm(r_correct)*norm(r_estimate)));
-% %     disp(radError)
-%     data(2,i) = rad2deg(radError);
-% 
-%     if celestial == "moon"
-%         l_cele = m(i,6:8);
-%     else
-%         l_cele = zeros(1,3);
-%     end
-%     
-%     l_sun = m(i,9:11);
-%     l_equ = m(i,3:5);
-% 
-%     rad_sun_cele = acos(dot(l_equ-l_cele, l_sun-l_cele)/(norm(l_equ-l_cele)*norm(l_sun-l_cele)));
-%     data(1,i) = rad2deg(rad_sun_cele);
-%     data(3,i) = m(i,44);
-%     data(4,i) = m(i,72)-m(i,42);
-%     data(5,i) = m(i,73)-m(i,43);
-%     data(6,i) = m(i,74)-m(i,44);
-% 
-% 
-% 
-% end
-% 
-% 
-% end

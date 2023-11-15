@@ -14,22 +14,24 @@ import estimate_r
 import christian_robinson
 import r2e
 import main_christian_function2
+import main_christian_function3
 import main_christian_function_shou
 
-date = "1102"
-ID =2
-for i in range(1):
-    r = main_christian_function2.main_christian(ID,date,"slsqp",0)
-    r2e.r2e(r)
+date = "1114"
+ID =1
+focus = 50
+for i in range(100):
+    # F = np.array([0.1,0.1,1,1,1,1])
+    # r,f = main_christian_function3.main_christian(ID,date,"slsqp",0,np.zeros(6))
     # print(i)
-    # try :
-
-    #     r = main_christian_function2.main_christian(ID,date,"slsqp",0.5)
-    #     # r2e.r2e(r)
+    try :
+        # F = np.array([0.1,0.1,1,1,1,1])
+        r,f = main_christian_function3.main_christian(ID,date,"slsqp",0,focus,np.zeros(6))
+        # r2e.r2e(r)
         
-    # except Exception as e:
-    #     print(e)
-    # print(str(ID)+"枚目")
+    except Exception as e:
+        print(e)
+    print(str(ID)+"枚目")
         
     
     ID += 1

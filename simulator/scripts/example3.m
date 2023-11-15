@@ -1,17 +1,18 @@
 clear()
 
 % 編集引数
-min_distance = 900000;
-max_distance = 1000000;
-min_deg = 0;
+min_distance = 70000;
+max_distance = 100000;
+min_deg = 45;
 max_deg = 90;
 
 celestial = "moon";
 % celestial = "earth";
 
+f = 50;
 
 
-equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
+equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance/10000, max_distance/10000, min_deg, max_deg);
 
 
 addpath('~/issl/research/simulator/mice/src/mice/')
@@ -161,14 +162,16 @@ l = norm(cele_vector);
 dcm2 = cspice_rotmat(dcm1, 2*pi*randi(100)/100, 2);
 
 %縦方向にずらす
-psi = deg2rad(2.09);
+% psi = deg2rad(2.09);
+psi = atan(0.494*7.4/2/f);
 dpsi_max = atan((l*tan(psi) - R)/l);
 dpsi = -dpsi_max + dpsi_max * randi(200) / 100;
 
 dcm3 = cspice_rotmat(dcm2, dpsi, 1);
 
 % 横方向にずらす
-phi = deg2rad(2.79);
+% phi = deg2rad(2.79);
+phi = atan(0.659*7.4/2/f);
 dphi_max = atan((l*tan(phi) - R)/l);
 dphi = -dphi_max + dphi_max * randi(200) / 100;
 
@@ -189,6 +192,7 @@ dlp_dcm2 = cspice_rotmat(dlp_dcm,-pi/2,1);
 
 % dlpから見た太陽方向
 sun_dlp = l_sun*dlp_dcm2';
+sun_dlp = sun_dlp/norm(sun_dlp);
 disp(sun_dlp)
 
 % 月の座標変換
@@ -228,7 +232,9 @@ end
 disp(cele_dlp')
 
 % 楕円係数を求める
-K = diag([50*494/3.66, 50*494/3.66, 1]);
+% K = diag([f*1000/7.4, f*494/3.66, 1]);
+K = diag([f*1000/7.4, f*1000/7.4, 1]);
+
 
 Tcp = dcm_moon1/dlp_dcm2;
 Tcp = cspice_rotmat(Tcp, pi/2, 1);
@@ -247,19 +253,25 @@ disp(M_mat);
 
 % グラムシュミット法
 
-n = ((l_sun - l_cele)/norm(l_sun - l_cele))';
+sun_cele = dlp_dcm2*((l_sun - l_cele)/norm(l_sun - l_cele))';
+% disp(sun_cele(1:2))
+% disp(sun_dlp(1:2)/norm(sun_dlp(1:2)))
+n = dlp_dcm2*((l_sun - l_cele)/norm(l_sun - l_cele))';
+% n = (sun_dlp/norm(sun_dlp))';
+% disp(n1)
+% disp(n)
 c1 = a1' - dot(a1',n)*n;
-p_tilda = c1/norm(c1);
-s_tilda = cross(n,p_tilda);
+p = c1/norm(c1);
+s = cross(n,p);
 
 
 
 Q4 = inv(R^2*eye(3));
 
 
-omega = (1/2) * atan((2 * p_tilda'* Q4 * s_tilda)/(p_tilda' * Q4 * p_tilda - s_tilda'* Q4 * s_tilda));
-p = cos(omega)*p_tilda + sin(omega)*s_tilda;
-s = -sin(omega)*p_tilda + cos(omega)*s_tilda;
+% omega = (1/2) * atan((2 * p_tilda'* Q4 * s_tilda)/(p_tilda' * Q4 * p_tilda - s_tilda'* Q4 * s_tilda));
+% p = cos(omega)*p_tilda + sin(omega)*s_tilda;
+% s = -sin(omega)*p_tilda + cos(omega)*s_tilda;
 % disp("confi")
 % disp(cross(p,s))
 % disp(n)
@@ -279,7 +291,9 @@ T = diag([1/M_term^2, 1/m_term^2, -1]);
 
 % dlp_dcm3 = cspice_rotmat(dlp_dcm2, pi, 2);
 
-R_ct = dlp_dcm2*R_tw;
+R_ct = R_tw;
+% R_ct = dlp_dcm2*R_tw;
+
 t_c = dlp_dcm2*cele_vector';
 
 
@@ -348,7 +362,7 @@ ellipseFile = sprintf("./ellipseImages/%d.png",id);
 print(ellipseFile,'-dpng')
 
 
-inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, dcm_moon, cele_dlp, coefficient];
+inforow = [id, et, r_equ, l_moon, l_sun,  dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, dcm_moon, cele_dlp, coefficient];
 
 writematrix(inforow, "information.csv", 'WriteMode', 'append')
 writematrix(inforow,"inforow.txt", 'Delimiter',',')

@@ -16,8 +16,9 @@ def r2e(r):
     print("a")
     print((a - c)**2 - b**2)
     e = abs((2*abs((a - c)**2 - b**2)**0.5)/(abs((a - c)**2 - b**2)**0.5 + a + c))**0.5
-    print("e^2")
+    print("e")
     print(e)
+    return e
                                              
 
                                              

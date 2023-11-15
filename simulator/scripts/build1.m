@@ -1,4 +1,4 @@
-function build1(min_distance,max_distance, min_deg, max_deg, n)
+function build1(min_distance,max_distance, min_deg, max_deg, n,f)
 
 % n = 5;
 % min_distance = 70000;
@@ -9,7 +9,7 @@ function build1(min_distance,max_distance, min_deg, max_deg, n)
 situation = "mac";
 celestial = "moon";
 
-output_name = "../../output/1113/information.csv";
+output_name = "../../output/5/information.csv";
 
 path_setting(situation)
 
@@ -27,6 +27,6 @@ end
 
 
 for i = id:id+n-1
-    calculate_data(equ_source_name,output_name, celestial, i)
+    calculate_data_fov(equ_source_name,output_name, celestial, i,f)
     disp(i+"回")
 end

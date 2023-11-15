@@ -44,6 +44,9 @@ camera{
    
     right -x*image_width/image_height
 	angle 5.58
+	// angle 9.96
+	// angle 27.4
+	// angle 52
 
 } 
 light_source { 
@@ -82,14 +85,14 @@ object {
     translate L_moon // <x, y, z>
 
 }
-object { 
-	sphere {<0 , 0 , 0> , 6378.1} 
+// object { 
+// 	sphere {<0 , 0 , 0> , 6378.1} 
 	
-	texture { 
-		pigment { rgb <1 , 1 , 1> } 
-	} 
+// 	texture { 
+// 		pigment { rgb <1 , 1 , 1> } 
+// 	} 
 
-} 
+// } 
 
 // merge {
 // 	object { Cylinder_X scale 1000 pigment { color Red } }		// x軸

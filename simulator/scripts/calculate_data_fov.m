@@ -1,4 +1,4 @@
-function calculate_data(equ_source_name,output_name,celestial, id,f)
+function calculate_data_fov(equ_source_name,output_name,celestial, id,f)
 
 
 rng('shuffle');
@@ -47,16 +47,18 @@ l = norm(cele_vector);
 dcm2 = cspice_rotmat(dcm1, 2*pi*randi(100)/100, 2);
 
 %縦方向にずらす
-psi = deg2rad(2.09);
+% psi = deg2rad(2.09);
+psi = atan(0.494*7.4/2/f);
 dpsi_max = atan((l*tan(psi) - R)/l);
-dpsi = -dpsi_max + dpsi_max * randi(200) / 100;
+dpsi = -dpsi_max + dpsi_max * 180 / 100;
 
 dcm3 = cspice_rotmat(dcm2, dpsi, 1);
 
 % 横方向にずらす
-phi = deg2rad(2.79);
+% phi = deg2rad(2.79);
+phi = atan(0.659*7.4/2/f);
 dphi_max = atan((l*tan(phi) - R)/l);
-dphi = -dphi_max + dphi_max * randi(200) / 100;
+dphi = -dphi_max + dphi_max * 185 / 100;
 
 dcm4 = cspice_rotmat(dcm3, dphi, 3);
 
@@ -101,7 +103,7 @@ end
 % disp(cele_dlp')
 
 % 楕円係数を求める
-K = diag([f*494/3.66, f*494/3.66, 1]);
+K = diag([f*1000/7.4, f*1000/7.4, 1]);
 
 Tcp = dcm_moon1/dlp_dcm2;
 Tcp = cspice_rotmat(Tcp, pi/2, 1);
@@ -197,6 +199,7 @@ coefficient_term = [A_term,B_term,C_term,D_term,F_term,G_term];
 inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, dcm_moon, cele_dlp, coefficient, coefficient_term, dlp_dcm2(1,:), dlp_dcm2(2,:), dlp_dcm2(3,:),];
 
 writematrix(inforow, output_name, 'WriteMode', 'append')
+writematrix(inforow,"inforow.txt", 'Delimiter',',')
 
 
 

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
 
-def slsqp(x,y,e):
+def slsqp(x,y,e,f):
     num = np.size(x)
     if num != np.size(y):
         print("Function sizes incorrect")
@@ -29,7 +29,13 @@ def slsqp(x,y,e):
         
         # return sum
         return np.dot(a, np.dot(D.T, np.dot(D, a))) 
-
+    def objective_grad(a):
+        # sum = 0
+        # for i in range(0,num):
+        #     sum += a[0]*x[i]**2 + a[1]*x[i]*y[i] + a[2]*y[i]**2 + a[3]*x[i] + a[4]*y[i] + a[5]
+        
+        # return sum
+        return 2*np.dot(D.T, np.dot(D, a))
     # 制約条件
     def constraint1(a):
         # return np.dot(a.T, np.dot(C, a))
@@ -43,10 +49,12 @@ def slsqp(x,y,e):
         # return np.dot(a.T, np.dot(D.T, np.dot(D, a)) + l1*(1 - np.dot(a.T, np.dot(C, a)) ) + l2*np.dot(a.T, np.dot(B, a)))
         return np.dot(a, np.dot(B, a))
 
+    def constraint2_d(a):
+        return 2*np.dot(B,a)
 
 
     # 初期値と制約条件を設定
-    a0 = np.array([0.1,0.1,1,1,1,1], dtype=np.float64)
+    a0 = np.array(f, dtype=np.float64)
     # constraints = ({'type': 'eq', 'fun': constraint1},
     #             {'type': 'eq', 'fun': constraint2})
 
@@ -57,6 +65,7 @@ def slsqp(x,y,e):
     # 結果の表示
     print("最適解:", result.x)
     print("最小値:", result.fun)
+    print(result.success)
     a = result.x[0]
     b = result.x[1]
     c = result.x[2]

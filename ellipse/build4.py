@@ -26,7 +26,7 @@ for i in range(400):
     try :
         r,f = main_christian_function3.main_christian(ID,date,"slsqp",0,focus,np.zeros(6))
         e = r2e.r2e(r)
-        r,f = main_christian_function3.main_christian(ID,date,"slsqp",e,focus,np.zeros(6))
+        r,f = main_christian_function3.main_christian(ID,date,"slsqp2",e,focus, f)
         
     except Exception as e:
         print(e)

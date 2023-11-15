@@ -27,14 +27,15 @@ def estimate_r(coe):
         v = V[:,2]/np.linalg.norm(V[:,2])
         l = w[2]
     else:
-        print("Fitzgibbon failed")
+        print("esitimate-r failed")
         exit()
     
 
 
     p = ((np.trace(C)-l*np.trace(A))/(l*(np.dot(v, np.dot(A, np.dot(A, v)))) - l*np.dot(v, np.dot(A,v))*np.trace(A)))**0.5
     r = p*v
-    print(r)
+    # print(r)
+    return r
     # # 初期推定値としてrを設定
     # r0 = np.random.rand(3)  # ランダムな初期値を使用する例
     # # print(r0)

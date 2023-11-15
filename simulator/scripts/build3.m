@@ -1,12 +1,13 @@
 clear()
-distances = 10000*[7,10,20,30,40,50,60,70,80,90,100];
-min_deg = 0;
-max_deg = 45;
-n=50;
+distances = 10000*[0.8,2,4,7,10];
+min_deg = 45;
+max_deg = 90;
+n=20;
+f = 5;
 
-for i = 1:4
-    for j = 1:10
-        build1(distances(j),distances(j+1), min_deg, max_deg,n)
+for i = 1:1
+    for j = 1:4
+        build1(distances(j),distances(j+1), min_deg, max_deg,n,f)
 %         min_distance = max_distance;
 %         max_distance = max_distance + 100000;
         disp(distances(j))

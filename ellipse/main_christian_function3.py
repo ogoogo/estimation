@@ -16,8 +16,9 @@ import matplotlib.pyplot
 import estimate_r
 import christian_robinson
 import scipy_slsqp2
+import scipy_powell
 
-def main_christian(ID,date,option,e,F):
+def main_christian(ID,date,option,e,focus,F):
 
     # date = "1102"
     # ID = 2
@@ -67,10 +68,10 @@ def main_christian(ID,date,option,e,F):
     values = np.array([value_10, value_11])
     dis = np.linalg.norm(values)
     u = values/dis
-    u2 = -values
+    u2 = -u
 
     sun_dlp = np.array([row[29],row[30],row[31]])
-
+    sun_dlp = sun_dlp/np.linalg.norm(sun_dlp)
     f_answer = np.array(row[44:50])
     # print(f_answer)
 
@@ -108,83 +109,137 @@ def main_christian(ID,date,option,e,F):
     # determine bright pixel threshold
     bright_thresh = 50
     
-    # generate horizon scan lines
-    b = np.array([[1,0],[-1,0],[0,1],[0,-1]])
-    edge = np.zeros((2*m,2))
-    pos = 0
-    for i in range(0,4,1):
-        
-        # check if border is appropriate
-        if np.dot(b[i],u) > 0:
+    def find_edge(u,bright_thresh):
+        # generate horizon scan lines
+        b = np.array([[1,0],[-1,0],[0,1],[0,-1]])
+        edge = np.zeros((2*m,2))
+        pos = 0
+        for i in range(0,4,1):
             
-            # determine each corner start position
-            if b[i,0] == 0:
-                yy = np.ones(m)*(0 if b[i,1] > 0 else height-1)
-                xx = np.arange(0, width, width/m)
-            else:
-                yy = np.arange(0, height, height/m)
-                xx = np.ones(m)*(0 if b[i,0] > 0 else width-1)
+            # check if border is appropriate
+            if np.dot(b[i],u) > 0:
                 
-    
-            # move along each strip and determine if encounter limb
-            for j in range(0, m, 1):
-                
-                y = int(yy[j])
-                x = int(xx[j])
-                
-                # move along the strip and break if suspected limb
-                count = 0
-                while y < height and y >= 0 and x < width and x >= 0:
+                # determine each corner start position
+                if b[i,0] == 0:
+                    yy = np.ones(m)*(0 if b[i,1] > 0 else height-1)
+                    xx = np.arange(0, width, width/m)
+                else:
+                    yy = np.arange(0, height, height/m)
+                    xx = np.ones(m)*(0 if b[i,0] > 0 else width-1)
                     
-                    # might be a limb, increase counter
-                    if image[y,x] > bright_thresh:
-                        count = count + 1
-                    
-                    # this could be a limb, hence include in measured position
-                    if count > window_radius:
-                        y = y - int(window_radius*step_size*u[1])
-                        x = x - int(window_radius*step_size*u[0])
-                        edge[pos,0] = np.float64(y)
-                        edge[pos,1] = np.float64(x)
-                        
-                        pos = pos + 1
-                        break
-                    
-                    # increase along strip
-                    y = y + int(step_size*u[1])
-                    x = x + int(step_size*u[0])
-                    
-    
-    # reduce suspected positions to pos
-    edge = edge[:pos,:]
-    
-    # apply Sobel-based pixel edge localisation
-    sobel = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
-    for i in range(0, pos):
-        y = int(edge[i,0])
-        x = int(edge[i,1])
         
-        # consider across each window mass
-        g_max = 0
-        for j in range(-window_radius,window_radius):
-            for k in range(-window_radius,window_radius):
-                
-                # check if image corner encountered
-                if y+j+2 >= height or y+j-1 < 0 or x+k+2 >= width or x+k-1 < 0:
-                    continue
-                
-                # determine gradient
-                g_x = np.sum(np.multiply(sobel,image[y+j-1:y+j+2,x+k-1:x+k+2]))
-                g_y = np.sum(np.multiply(np.transpose(sobel),image[y+j-1:y+j+2,x+k-1:x+k+2]))
-                g = np.sqrt(g_x**2 + g_y**2)
-                
-                
-                # determine max
-                if g > g_max:
-                    edge[i,0] = np.float64(y + j)
-                    edge[i,1]= np.float64(x + k)
-                    g_max = g 
-                
+                # move along each strip and determine if encounter limb
+                for j in range(0, m, 1):
+                    
+                    y = int(yy[j])
+                    x = int(xx[j])
+                    
+                    # move along the strip and break if suspected limb
+                    count = 0
+                    
+                    while y < height and y >= 0 and x < width and x >= 0:
+                        
+                        # might be a limb, increase counter
+                        if image[y,x] > bright_thresh:
+                            count = count + 1
+                        
+                        # this could be a limb, hence include in measured position
+                        if count > window_radius:
+                            y = y - int(window_radius*step_size*u[1])
+                            x = x - int(window_radius*step_size*u[0])
+                            edge[pos,0] = np.float64(y)
+                            edge[pos,1] = np.float64(x)
+                            pos = pos + 1
+
+                            break
+
+                        # increase along strip
+                        y = y + int(step_size*u[1])
+                        x = x + int(step_size*u[0])
+ 
+        
+        # reduce suspected positions to pos
+        edge = edge[:pos,:]
+        
+        # apply Sobel-based pixel edge localisation
+        sobel = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
+        for i in range(0, pos):
+            y = int(edge[i,0])
+            x = int(edge[i,1])
+            
+            # consider across each window mass
+            g_max = 0
+            for j in range(-window_radius,window_radius):
+                for k in range(-window_radius,window_radius):
+                    
+                    # check if image corner encountered
+                    if y+j+2 >= height or y+j-1 < 0 or x+k+2 >= width or x+k-1 < 0:
+                        continue
+                    
+                    # determine gradient
+                    g_x = np.sum(np.multiply(sobel,image[y+j-1:y+j+2,x+k-1:x+k+2]))
+                    g_y = np.sum(np.multiply(np.transpose(sobel),image[y+j-1:y+j+2,x+k-1:x+k+2]))
+                    g = np.sqrt(g_x**2 + g_y**2)
+                    
+                    
+                    # determine max
+                    if g > g_max:
+                        edge[i,0] = np.float64(y + j)
+                        edge[i,1]= np.float64(x + k)
+                        g_max = g 
+        return edge,pos
+                    
+    edge,pos = find_edge(u,50)
+    edge_t,pos_t = find_edge(u2,30)
+    edge_r = np.zeros((pos_t,2))
+    xmax = -659
+    xmin = 659
+    mat_r = np.array([[u2[1],-u2[0]],u2])
+    for i in range(pos_t):
+        
+        # print(mat_r)
+        edge_r[i] = np.dot(edge_t[i],mat_r)
+        # print(edge_r[i])
+        if xmax < edge_r[i,1]:
+            xmax = edge_r[i,1]
+            # print(xmax)
+            end = i
+        if xmin > edge_r[i,1]:
+            xmin = edge_r[i,1]
+            # print(xmin)
+            start = i
+    
+    # mean = int((xmin + xmax)/2)
+    # print(mean)
+    # x_3_r = edge_r[edge_r[:, 1] == mean]
+    # absolute_differences = np.abs(edge_r[:, 1] - mean)
+    # closest_row_index = np.argmin(absolute_differences)
+    # x_3_r = edge_r[closest_row_index]
+    # x_3 = np.dot(x_3_r,mat_r.T)
+    # x_3 = np.array([x_3[1],x_3[0]],dtype=np.float64)
+    
+    # original_image = insert_pixel(original_image,x_3[0],x_3[1],(0,255,255),3)
+    
+    x_1 = np.array([edge_t[start,1],edge_t[start,0]])
+    original_image = insert_pixel(original_image,x_1[0],x_1[1],(0,255,255),3)
+    # print(x_1)
+    x_2 = np.array([edge_t[end,1],edge_t[end,0]])
+    original_image = insert_pixel(original_image,x_2[0],x_2[1],(0,255,255),3)
+    # print(x_2)
+    x_c = np.array([(x_1[0]+x_2[0])/2, (x_1[1]+x_2[1])/2])
+    # print(x_c)
+    radius = np.linalg.norm(x_1-x_2)/2
+    # print(radius)
+    a_i = 1.1
+    b_i = 0
+    c_i = 1
+    d_i = -2*x_c[0]
+    f_i = -2*x_c[1]
+    g_i = x_c[0]**2 + x_c[1]**2 -radius**2
+    F_ini = np.array([a_i,b_i,c_i,d_i,f_i,g_i])
+    print(F_ini)
+
+
     
     # for sub-pixel edge localisation, apply Zernike moments
     def zernike(n,m,window_radius,j,k):
@@ -269,6 +324,19 @@ def main_christian(ID,date,option,e,F):
             original_image.putpixel((int(edge[i,1])-1,int(edge[i,0])+1), (255,0,0))
         except Exception as e:
             print(e)
+    for i in range(0, pos_t):
+        try:
+            original_image.putpixel((int(edge_t[i,1])+1,int(edge_t[i,0])-1), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1])+1,int(edge_t[i,0])), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1])+1,int(edge_t[i,0])+1), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1]),int(edge_t[i,0])-1), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1]),int(edge_t[i,0])), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1]),int(edge_t[i,0])+1), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1])-1,int(edge_t[i,0])-1), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1])-1,int(edge_t[i,0])), (255,0,0))
+            original_image.putpixel((int(edge_t[i,1])-1,int(edge_t[i,0])+1), (255,0,0))
+        except Exception as e:
+            print(e)
     # perform fitzgibbon fit using RANSAC test
     N_test = 0
     N_min = pos
@@ -293,9 +361,14 @@ def main_christian(ID,date,option,e,F):
         elif option == "e":
             f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
         elif option == "slsqp":
+            f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e, F_ini)
+        elif option == "slsqp2":
             f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e, F)
         elif option == "term":
-            f = scipy_slsqp2.slsqp2(edge[:,1], edge[:,0], e, F, sun_dlp)
+            f = scipy_slsqp2.slsqp2(edge[:,1], edge[:,0], e, F_ini, sun_dlp, edge_t[:,1], edge_t[:,0],width,height,x_3)
+        elif option == "powell":
+            f = scipy_powell.powell(edge[:,1], edge[:,0], e, F_ini, sun_dlp, edge_t[:,1], edge_t[:,0],width,height,x_3)
+
         else:
             raise ValueError("option is wrong")
         
@@ -330,8 +403,14 @@ def main_christian(ID,date,option,e,F):
     elif option == "e":
         f = fitzgibbon_e_2.fitzgibbon_fit(edge[:,1], edge[:,0], e)
     elif option == "slsqp":
+        f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e,F_ini)
+    elif option == "slsqp2":
         f = scipy_slsqp.slsqp(edge[:,1], edge[:,0], e,F)
-        
+    elif option == "term":
+        f = scipy_slsqp2.slsqp2(edge[:,1], edge[:,0], e, F_ini, sun_dlp, edge_t[:,1], edge_t[:,0],width,height,x_3)
+    elif option == "powell":
+        f = scipy_powell.powell(edge[:,1], edge[:,0], e, F_ini, sun_dlp, edge_t[:,1], edge_t[:,0],width,height,x_3)
+
     else:
         raise ValueError("option is wrong")
     # print(f.tolist())
@@ -424,7 +503,7 @@ def main_christian(ID,date,option,e,F):
     # print(x2)
     m2 = x2.shape
     # print(m2)
-    f_column = np.full((m2[0], 1), 50*494/3.66)
+    f_column = np.full((m2[0], 1),focus*494/3.66)
     # print(f_column)
     x2 = np.array(x2).reshape(-1, 1)
     y2 = np.array(y2).reshape(-1, 1)
@@ -440,6 +519,94 @@ def main_christian(ID,date,option,e,F):
         df[72] = 0
         df[73] = 0
     df.iloc[ID-1,71:74] = r
+
+    # r = estimate_r.estimate_r(a)
+    # print(r)
+    # R = 1737.4
+    # n = sun_dlp/np.linalg.norm(sun_dlp)
+    # a1 = np.array([1,0,0])
+    # c1 = a1 - np.dot(a1,n)*n
+    # p = c1/np.linalg.norm(c1)
+    # s = np.cross(n,p)
+
+    # Rct = np.array([[p[0],s[0],n[0]],
+    #                 [p[1],s[1],n[1]],
+    #                 [p[2],s[2],n[2]]],dtype=np.float64) 
+
+    
+    # Q = np.array([[1/R**2,0,0],
+    #                 [0,1/R**2,0],
+    #                 [0,0,1/R**2]],dtype=np.float64) 
+    
+    # M = (1/np.dot(p,np.dot(Q,p)))**0.5
+    # m = (1/np.dot(s,np.dot(Q,s)))**0.5
+
+    # T = np.array([[1/M**2,0,0],
+    #                 [0,1/m**2,0],
+    #                 [0,0,-1]],dtype=np.float64) 
+    
+    # H1 = np.array([[Rct[0][0], Rct[0][1], r[0]],
+    #                 [Rct[1][0], Rct[1][1], r[1]],
+    #                 [Rct[2][0], Rct[2][1], r[2]]],dtype=np.float64)
+    
+    # # K = np.diag([f*1000/7.4,f*1000/7.4,1])
+    # focus = 50
+    # K = np.array([[focus*1000/7.4,0,0],
+    #                 [0,focus*1000/7.4,0],
+    #                 [0,0,1]],dtype=np.float64)
+    # H = K@H1
+    # T_dash = np.linalg.inv(H.T)@T@np.linalg.inv(H)
+
+    # y0 = 247
+    # x0 = 329.5
+    # a_t = T_dash[0][0]
+    # b_t = 2*T_dash[0][1]
+    # c_t = T_dash[1][1]
+    # d_t = 2*T_dash[0][2]
+    # f_t = 2*T_dash[1][2]
+    # g_t = T_dash[2][2]
+    # g_t = a_t*x0**2 + b_t*x0*y0 + c_t*y0**2 -d_t*x0 -f_t*y0 +g_t
+    # f_t = -b_t*x0 - 2*c_t*y0 + f_t
+    # d_t= -2*a_t*x0 -b_t*y0 + d_t
+
+    # # b = np.array([a_t,b_t,c_t,d_t,f_t,g_t]) 
+    # b = np.array([a_t,b_t,c_t,d_t,f_t,g_t]) 
+    # x = np.arange(0,width,1)
+    # y = np.arange(0,height,1)
+    # x,y = np.meshgrid(x,y)
+    # z = b[0]*x**2 + b[1]*x*y + b[2]*y**2 + b[3]*x + b[4]*y + b[5]
+    # plt = matplotlib.pyplot.contour(z,[0])
+    # x = plt.collections[0].get_paths()[0].vertices[:,0]
+    # y = plt.collections[0].get_paths()[0].vertices[:,1]
+    # edge_t = np.array([x,y]).T
+    # edge_r = np.zeros((np.size(x),2))
+    # mat_r = np.array([[sun_dlp[1],-sun_dlp[0]],[sun_dlp[0],sun_dlp[1]]])
+    # xmax = -659
+    # xmin = 659
+    # for i in range(np.size(x)):
+    #     # print(mat_r)
+    #     edge_r[i] = np.dot(edge_t[i],mat_r.T)
+    #     # print(edge_r[i])
+    #     if xmax < edge_r[i,1]:
+    #         xmax = edge_r[i,1]
+    #         # print(xmax)
+    #         end = i
+    #     if xmin > edge_r[i,1]:
+    #         xmin = edge_r[i,1]
+    #         # print(xmin)
+    #         start = i
+    
+    # x_3 = np.array([edge_t[start][0], edge_t[start][1]])
+    # print("x_3")
+    # print(x_3)
+    # for i in range(0,len(x)):
+    #     if int(y[i]) >= height-1 or int(y[i]) <= 0 or \
+    #         int(x[i]) >= width-1 or int(x[i]) <= 0:
+    #         continue
+    #     original_image = insert_pixel(original_image,x[i],y[i],(0,0,255),line_thickness)
+    # original_image = insert_pixel(original_image,x_3[0],x_3[1],(255,255,0),3)
+
+    # original_image.show()
 
     df.to_csv(csv_file_path, index=False, header=False)     
     # estimate_r.estimate_r(f)

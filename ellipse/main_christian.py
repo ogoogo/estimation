@@ -17,7 +17,7 @@ import estimate_r
 import christian_robinson
 
 
-date = "1112"
+date = "1102"
 ID = 1
 e = 0.1
 # constants
@@ -229,35 +229,35 @@ if __name__ == "__main__":
             
             return M_nm_real[0] + 1j*M_nm_imag[0]
 
-        # construct Zernike moments
-        M_11 = np.zeros((zernike_radius*2+1,zernike_radius*2+1),dtype=complex)
-        M_20 = np.zeros((zernike_radius*2+1,zernike_radius*2+1),dtype=complex)    
-        for j in range(-zernike_radius,zernike_radius+1):
-            for k in range(-zernike_radius,zernike_radius+1):
-                M_11[zernike_radius+j,zernike_radius+k] = zernike(1,1,zernike_radius,k,j)
-                M_20[zernike_radius+j,zernike_radius+k] = zernike(2,0,zernike_radius,k,j)
+        # # construct Zernike moments
+        # M_11 = np.zeros((zernike_radius*2+1,zernike_radius*2+1),dtype=complex)
+        # M_20 = np.zeros((zernike_radius*2+1,zernike_radius*2+1),dtype=complex)    
+        # for j in range(-zernike_radius,zernike_radius+1):
+        #     for k in range(-zernike_radius,zernike_radius+1):
+        #         M_11[zernike_radius+j,zernike_radius+k] = zernike(1,1,zernike_radius,k,j)
+        #         M_20[zernike_radius+j,zernike_radius+k] = zernike(2,0,zernike_radius,k,j)
 
         # perform sub-pixel determination by Zernike
         for i in range(0, pos):
-            y = int(edge[i,0])
-            x = int(edge[i,1])
-            A_11 = 0
-            A_20 = 0
-            for j in range(-zernike_radius,zernike_radius+1):
-                for k in range(-zernike_radius,zernike_radius+1):
-                    A_11 = A_11 + image[y+j,x+k]*M_11[j+zernike_radius,k+zernike_radius]
-                    A_20 = A_20 + image[y+j,x+k]*M_20[j+zernike_radius,k+zernike_radius]
+            # y = int(edge[i,0])
+            # x = int(edge[i,1])
+            # A_11 = 0
+            # A_20 = 0
+            # for j in range(-zernike_radius,zernike_radius+1):
+            #     for k in range(-zernike_radius,zernike_radius+1):
+            #         A_11 = A_11 + image[y+j,x+k]*M_11[j+zernike_radius,k+zernike_radius]
+            #         A_20 = A_20 + image[y+j,x+k]*M_20[j+zernike_radius,k+zernike_radius]
                     
-            # determine orientation and length from estimated pixel position
-            A_20 = np.real(A_20)
-            psi = np.arctan2(np.imag(A_11),np.real(A_11))
-            Aprime_11 = np.real(A_11)*np.cos(psi) + np.imag(A_11)*np.sin(psi)
-            w = 1.66*sigma_psf
-            l = (1 - w**2 - np.sqrt((w**2-1)**2 - 2*w**2*A_20/Aprime_11))/w**2
+            # # determine orientation and length from estimated pixel position
+            # A_20 = np.real(A_20)
+            # psi = np.arctan2(np.imag(A_11),np.real(A_11))
+            # Aprime_11 = np.real(A_11)*np.cos(psi) + np.imag(A_11)*np.sin(psi)
+            # w = 1.66*sigma_psf
+            # l = (1 - w**2 - np.sqrt((w**2-1)**2 - 2*w**2*A_20/Aprime_11))/w**2
             
-            # adjust estimated pixel position
-            edge[i,0] = edge[i,0] + (zernike_radius*2+1)*l*np.cos(psi)
-            edge[i,1] = edge[i,1] + (zernike_radius*2+1)*l*np.sin(psi)
+            # # adjust estimated pixel position
+            # edge[i,0] = edge[i,0] + (zernike_radius*2+1)*l*np.cos(psi)
+            # edge[i,1] = edge[i,1] + (zernike_radius*2+1)*l*np.sin(psi)
             original_image.putpixel((int(edge[i,1])+1,int(edge[i,0])-1), (255,0,0))
             original_image.putpixel((int(edge[i,1])+1,int(edge[i,0])), (255,0,0))
             original_image.putpixel((int(edge[i,1])+1,int(edge[i,0])+1), (255,0,0))
