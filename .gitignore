@@ -12,3 +12,4 @@ __*
 *.DS_Store
 simulator/kernel/
 simulator/mice/
+!/output/1118_ras/
