@@ -1,3 +1,4 @@
+% 画角に入ってるやつだけの視線方向比較
 clear()
 date = "1114";
 celestial = "moon";

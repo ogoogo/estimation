@@ -69,7 +69,8 @@ for i = 1:rows2
     radError2 = acos(dot(l_equ_c,l_equ_e)/(norm(l_equ_c)*norm(l_equ_e)));
     data(12,i) = rad2deg(radError2);
 
-
+% サンセンサずらした角度
+    data(13,i) = m(i,12);
 end
 
 

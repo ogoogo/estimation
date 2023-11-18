@@ -1,3 +1,4 @@
+% 画角の比較
 clear()
 
 fileName = "../output/50/information_e0.csv";

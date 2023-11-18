@@ -1,3 +1,4 @@
+% j2000での比較
 clear()
 date = "1114";
 celestial = "moon";

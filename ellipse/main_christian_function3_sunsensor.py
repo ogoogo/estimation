@@ -642,7 +642,7 @@ def main_christian(ID,date,option,e,focus,F):
     #     original_image = insert_pixel(original_image,x[i],y[i],(0,0,255),line_thickness)
     # # original_image = insert_pixel(original_image,x_3[0],x_3[1],(255,255,0),3)
 
-    original_image.show()
+    # original_image.show()
 
     df.to_csv(csv_file_path, index=False, header=False)     
     # estimate_r.estimate_r(f)

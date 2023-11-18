@@ -1,0 +1,18 @@
+% サンセンサのずれ比較
+clear()
+
+date = "1114";
+
+fileName = "../output/"+date + "/information_fitz.csv";
+M = readmatrix(fileName);
+
+M1 = M(1:41,:);
+M2 = M(42:82,:);
+M3 = M(83:124,:);
+
+m1 = createData(M1);
+m2 = createData(M2);
+m3 = createData(M3);
+
+figure(1)
+plot([m1(13,:),m1()])

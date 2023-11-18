@@ -1,3 +1,4 @@
+% エラーはデータがないやつのみ
 clear()
 date = "1114";
 celestial = "moon";

@@ -1,3 +1,4 @@
+% 45度ずつに分けて視線ベクトルx,y,z方向誤差を出す
 clear()
 date = "1107";
 fileName = "../output/"+date + "/information01.csv";
