@@ -1,7 +1,7 @@
 % サンセンサのずれ比較
 clear()
 
-date = "1115";
+date = "1116";
 
 fileName = "../output/"+date + "/information.csv";
 M = readmatrix(fileName);
@@ -21,3 +21,5 @@ plot(m2(13,:),m2(2,:))
 hold on
 plot(m3(13,:),m3(2,:))
 legend("45°","90°","135°")
+
+saveas(1, '../output/graph2/sunsensor/sunsensor.png')

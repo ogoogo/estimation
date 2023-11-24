@@ -1,19 +1,19 @@
 % 画角に入ってるやつだけの視線方向比較
 clear()
-date = "1114";
+date = "1120";
 celestial = "moon";
 
 f = 50;
 phi = atan(0.494*7.4/2/f);
 k = 1000000*tan(phi);
 
-fileName = "../output/"+date + "/information_fitz.csv";
+fileName = "../output/"+date + "/information_e0.csv";
 M1 = readmatrix(fileName);
 
-fileName = "../output/"+date + "/information_3.csv";
+fileName = "../output/"+date + "/information_b.csv";
 M2 = readmatrix(fileName);
 
-fileName = "../output/"+date + "/information_4.csv";
+fileName = "../output/"+date + "/information_c.csv";
 M3 = readmatrix(fileName);
 
 [row,col] = size(M1);

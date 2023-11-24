@@ -84,7 +84,7 @@ dlp_dcm4 = cspice_rotmat(dlp_dcm3,-pi/2,1);
 sun_dlp = l_sun*dlp_dcm4';
 % disp(sun_dlp)
 
-cele_dlp = l_cele*dlp_dcm4';
+cele_dlp =(l_moon - r_equ)*dlp_dcm4';
 
 
 % 月の座標変換

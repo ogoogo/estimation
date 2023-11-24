@@ -15,23 +15,24 @@ import christian_robinson
 import r2e
 import main_christian_function2
 import main_christian_function3
-import main_christian_function_shou
+import main_christian_function3_dlp
+import main_christian_function3_zernike
 
-date = "1102"
+date = "1120"
 ID =1
 focus = 50
-for i in range(1):
+for i in range(800):
     # F = np.array([0.1,0.1,1,1,1,1])
     # r,f = main_christian_function3.main_christian(ID,date,"slsqp",0,np.zeros(6))
-    r,f = main_christian_function3.main_christian(ID,date,"fitz",0,focus,np.zeros(6))
+    # r,f = main_christian_function3.main_christian(ID,date,"fitz",0,focus,np.zeros(6))
     # print(i)
-    # try :
+    try :
         # F = np.array([0.1,0.1,1,1,1,1])
-        # r,f = main_christian_function3.main_christian(ID,date,"fitz",0,focus,np.zeros(6))
+        r,f = main_christian_function3_zernike.main_christian(ID,date,"fitz",0,focus,np.zeros(6))
         # r2e.r2e(r)
         
-    # except Exception as e:
-    #     print(e)
+    except Exception as e:
+        print(e)
     print(str(ID)+"枚目")
         
     

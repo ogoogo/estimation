@@ -1,0 +1,236 @@
+% 2つずつセットを作る
+clear()
+date = "1120";
+celestial = "moon";
+
+% limited = 0;
+sets = ["fitz","a"]; 
+colors = ["b","r"];
+legends = ["fitzgibbon", "method-a"];
+
+f = 50;
+phi = atan(0.494*7.4/2/f);
+k = 1000000*tan(phi);
+
+fileName = "../output/"+date + "/information_"+sets(1)+".csv";
+M1 = readmatrix(fileName);
+
+fileName = "../output/"+date + "/information_"+sets(2)+".csv";
+M2 = readmatrix(fileName);
+
+
+[row,col] = size(M1);
+
+
+data1_ = createData(M1);
+data2_ = createData(M2);
+
+data1 = filterData(data1_);
+data2 = filterData(data2_);
+
+nondata1 = eliminateData(data1_);
+nondata2 = eliminateData(data2_);
+
+figure(1)
+scatter(data1(1,:),data1(2,:), 10, colors(1),'filled')
+hold on
+scatter(data2(1,:), data2(2,:), 10, colors(2),'filled')
+hold on
+mvmeans = zeros(3,18);
+for i = 1:18
+    rows1 = data1(1,:) >= (i-1)*10 & data1(1,:) <= i*10;
+    rows2 = data2(1,:) >= (i-1)*10 & data2(1,:) <= i*10;
+    mvmeans(1,i) = (i-0.5)*10;
+    mvmeans(2,i) = mean(data1(2,rows1));
+    mvmeans(3,i) = mean(data2(2,rows2));
+end
+
+plot(mvmeans(1,:),mvmeans(2,:),'LineWidth',3)
+hold on 
+plot(mvmeans(1,:),mvmeans(3,:),'LineWidth',3)
+legend(legends(1), legends(2),legends(1) + " movmeans",legends(2) + " movmeans",'AutoUpdate','off')
+grid on;
+xlim([0,180])
+% ylim([0,1000000])
+ylim([0,max([max(data1(2,:)),max(data2(2,:))])])
+title("sun-camera angular - error")
+xlabel("sun-camera angular(deg)")
+ylabel("error(deg)")
+
+
+
+figure(2)
+scatter(data1(1,:),data1(2,:), 10, colors(1),'filled')
+hold on
+scatter(data2(1,:), data2(2,:), 10, colors(2),'filled')
+hold on
+plot(mvmeans(1,:),mvmeans(2,:),'LineWidth',3)
+hold on 
+plot(mvmeans(1,:),mvmeans(3,:),'LineWidth',3)
+legend(legends(1), legends(2),legends(1) + " movmeans",legends(2) + " movmeans",'AutoUpdate','off')
+grid on;
+xlim([0,180])
+% ylim([0,1000000])
+ylim([0,0.2])
+title("sun-camera angular - error (limit)")
+xlabel("sun-camera angular(deg)")
+ylabel("error(deg)")
+
+
+figure(3)
+scatter(data1(3,:),data1(2,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(2,:), 10, colors(2),'filled')
+hold on
+for i = 1:18
+    rows1 = data1(1,:) >= (i-1)*10 & data1(1,:) <= i*10;
+    rows2 = data2(1,:) >= (i-1)*10 & data2(1,:) <= i*10;
+    mvmeans(1,i) = (i-0.5)*10;
+    mvmeans(2,i) = mean(data1(2,rows1));
+    mvmeans(3,i) = mean(data2(2,rows2));
+end
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+xlim([70000,1000000])
+ylim([0,max([max(data1(2,:)),max(data2(2,:))])])
+title("true-distance - error")
+xlabel("true distance(km)")
+ylabel("error(deg)")
+
+figure(4)
+scatter(data1(3,:),data1(2,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(2,:), 10, colors(2),'filled')
+
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+xlim([70000,1000000])
+ylim([0,0.2])
+title("true-distance - error (limit)")
+xlabel("true distance(km)")
+ylabel("error(deg)")
+
+figure(5)
+scatter(data1(3,:),data1(4,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(4,:), 10, colors(2),'filled')
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+yline(0)
+xlim([70000,1000000])
+limit = max([max(abs(data1(4,:))),max(abs(data2(4,:)))]);
+ylim([-limit, limit])
+title("x Error")
+xlabel("true distance (km)")
+ylabel("x error (km)")
+
+figure(6)
+scatter(data1(3,:),data1(4,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(4,:), 10, colors(2),'filled')
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+yline(0)
+xlim([70000,1000000])
+limit = max([max(abs(data1(4,:))),max(abs(data2(4,:)))]);
+ylim([-20000,20000])
+title("x Error (limit)")
+xlabel("true distance (km)")
+ylabel("x error (km)")
+
+figure(7)
+scatter(data1(3,:),data1(5,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(5,:), 10, colors(2),'filled')
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+yline(0)
+xlim([70000,1000000])
+limit = max([max(abs(data1(5,:))),max(abs(data2(5,:)))]);
+ylim([-limit, limit])
+title("y Error")
+xlabel("true distance (km)")
+ylabel("y error (km)")
+
+figure(8)
+scatter(data1(3,:),data1(5,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(5,:), 10, colors(2),'filled')
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+yline(0)
+xlim([70000,1000000])
+limit = max([max(abs(data1(5,:))),max(abs(data2(5,:)))]);
+ylim([-20000,20000])
+title("y Error (limit)")
+xlabel("true distance (km)")
+ylabel("y error (km)")
+
+figure(9)
+scatter(data1(3,:),data1(6,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(6,:), 10, colors(2),'filled')
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+yline(0)
+limit = max([max(abs(data1(6,:))),max(abs(data2(6,:)))]);
+xlim([70000,1000000])
+ylim([-limit, limit])
+title("z Error")
+xlabel("true distance (km)")
+ylabel("z error (km)")
+
+figure(10)
+scatter(data1(3,:),data1(6,:), 10, colors(1),'filled')
+hold on
+scatter(data2(3,:), data2(6,:), 10, colors(2),'filled')
+legend(legends(1), legends(2),'AutoUpdate','off')
+grid on;
+yline(0)
+limit = max([max(abs(data1(6,:))),max(abs(data2(6,:)))]);
+xlim([70000,1000000])
+ylim([-1000000,1000000])
+title("z Error (limit)")
+xlabel("true distance (km)")
+ylabel("z error (km)")
+
+
+
+figure(11)
+hist3([nondata1(1,:)',nondata1(2,:)'],'Nbins',[18,20]);
+% xlim([0,180])
+title("number of errors ("+sets(1)+")")
+xlabel("sun angular")
+ylabel("true distance")
+zlabel("number of error data(fitz)")
+xlim([0,180])
+ylim([70000,1000000])
+zlim([0,5])
+
+figure(12)
+hist3([nondata2(1,:)',nondata2(2,:)'],'Nbins',[18,20]);
+% xlim([0,180])
+title("number of errors ("+sets(2)+")")
+xlabel("sun angular")
+ylabel("true distance")
+zlabel("number of error data(fitz)")
+xlim([0,180])
+ylim([70000,1000000])
+zlim([0,5])
+
+
+saveas(1, '../output/graph2/'+sets(1)+'_'+sets(2)+'/sun-cam_error.png')
+saveas(2, '../output/graph2/'+sets(1)+'_'+sets(2)+'/sun-cam_error_limit.png')
+saveas(3, '../output/graph2/'+sets(1)+'_'+sets(2)+'/truez_error.png')
+saveas(4, '../output/graph2/'+sets(1)+'_'+sets(2)+'/truez_error_limit.png')
+saveas(5, '../output/graph2/'+sets(1)+'_'+sets(2)+'/true-z_x.png')
+saveas(6, '../output/graph2/'+sets(1)+'_'+sets(2)+'/true-z_x_limit.png')
+saveas(7, '../output/graph2/'+sets(1)+'_'+sets(2)+'/true-z_y.png')
+saveas(8, '../output/graph2/'+sets(1)+'_'+sets(2)+'/true-z_y_limit.png')
+saveas(9, '../output/graph2/'+sets(1)+'_'+sets(2)+'/true-z_z.png')
+saveas(10, '../output/graph2/'+sets(1)+'_'+sets(2)+'/true-z_z_limit.png')
+saveas(11, '../output/graph2/'+sets(1)+'_'+sets(2)+'/hist1.png')
+saveas(12, '../output/graph2/'+sets(1)+'_'+sets(2)+'/hist2.png')
+
+
+

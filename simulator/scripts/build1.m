@@ -9,7 +9,7 @@ function build1(min_distance,max_distance, min_deg, max_deg, n,f)
 situation = "mac";
 celestial = "moon";
 
-output_name = "../../output/1118/information.csv";
+output_name = "../../output/1123/information.csv";
 
 path_setting(situation)
 
@@ -27,6 +27,6 @@ end
 
 
 for i = id:id+n-1
-    calculate_data(equ_source_name,output_name, celestial, i,f)
+    calculate_data_wearth(equ_source_name,output_name, celestial, i,f)
     disp(i+"回")
 end

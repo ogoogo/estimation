@@ -27,13 +27,14 @@ echo "$csv_count"
 
 # done
 
-input_csv="../../output/1123/information.csv"
+input_csv="../../output/1121/information.csv"
 echo "$input_csv"
 
 tail -n +$((id % 10000)) "$input_csv" | while IFS= read -r line; do
 
     echo "$line" > "inforow.txt"
-    povray povray.pov +W659 +H494 Output_File_Name=../../output/1123/images/raw/$id
+    povray povray.pov +W659 +H494 Output_File_Name=../../output/1121/images/raw/moon/$id
+    povray povray_earth.pov +W659 +H494 Output_File_Name=../../output/1121/images/raw/earth/$id
     echo "ID{$id}の画像生成"
     id=$((id + 1))
 

@@ -1,8 +1,10 @@
 import numpy as np
 
-def christian_robinson(s):
-
-    R = 1737.4
+def christian_robinson(s,celestial):
+    if celestial == "moon":
+        R = 1737.4
+    else:
+        R = 6378.1
     D = np.array([[1/R, 0, 0],[0, 1/R, 0], [0, 0, 1/R]])
     n,m = s.shape
     # print(m,n)

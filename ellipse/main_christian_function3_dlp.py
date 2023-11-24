@@ -83,7 +83,8 @@ def main_christian(ID,date,option,e,focus,F,celestial):
 
     # read image from file and convert to black and white
     original_image = Image.open(IMAGE_FILE_NAME).convert('RGB')
-    image = np.array(Image.open(IMAGE_FILE_NAME).convert('L'))
+    image_ = np.array(Image.open(IMAGE_FILE_NAME).convert('L'))
+    image = image_[2:496, 2:661]
     height, width = image.shape
     
     def insert_pixel(image,x,y,color,size):
@@ -96,7 +97,7 @@ def main_christian(ID,date,option,e,focus,F,celestial):
                 if int(y)+j >= height-1 or int(y)+j <= 0 or \
                     int(x)+i >= width-1 or int(x)+i <= 0:
                     continue
-                image.putpixel((int(x)+i,int(y)+j), color)
+                image.putpixel((int(x)+i+2,int(y)+j+2), color)
     
         return image
     
@@ -477,22 +478,22 @@ def main_christian(ID,date,option,e,focus,F,celestial):
     x2 = np.array(x, dtype=np.float64)
     y2 = np.array(y, dtype=np.float64)
 
-    x_ans = np.arange(0,width,1)
-    y_ans = np.arange(0,height,1)
-    x_ans,y_ans = np.meshgrid(x_ans,y_ans)
+    # x_ans = np.arange(0,width,1)
+    # y_ans = np.arange(0,height,1)
+    # x_ans,y_ans = np.meshgrid(x_ans,y_ans)
 
-    z_ans = f_answer[0]*(x_ans)**2 + f_answer[1]*(x_ans)*(y_ans) + f_answer[2]*(y_ans)**2 + f_answer[3]*(x_ans) + f_answer[4]*(y_ans) + f_answer[5]
-    plt_ans = matplotlib.pyplot.contour(z_ans,[0])
-    x_ans = plt_ans.collections[0].get_paths()[0].vertices[:,0] 
-    y_ans = plt_ans.collections[0].get_paths()[0].vertices[:,1] 
+    # z_ans = f_answer[0]*(x_ans)**2 + f_answer[1]*(x_ans)*(y_ans) + f_answer[2]*(y_ans)**2 + f_answer[3]*(x_ans) + f_answer[4]*(y_ans) + f_answer[5]
+    # plt_ans = matplotlib.pyplot.contour(z_ans,[0])
+    # x_ans = plt_ans.collections[0].get_paths()[0].vertices[:,0] 
+    # y_ans = plt_ans.collections[0].get_paths()[0].vertices[:,1] 
     # print(x)
 
 
-    for i in range(0,len(x_ans)):
-        if int(y_ans[i]) >= height-1 or int(y_ans[i]) <= 0 or \
-            int(x_ans[i]) >= width-1 or int(x_ans[i]) <= 0:
-            continue
-        original_image = insert_pixel(original_image,x_ans[i],y_ans[i],(0,255,0),line_thickness)  
+    # for i in range(0,len(x_ans)):
+    #     if int(y_ans[i]) >= height-1 or int(y_ans[i]) <= 0 or \
+    #         int(x_ans[i]) >= width-1 or int(x_ans[i]) <= 0:
+    #         continue
+    #     original_image = insert_pixel(original_image,x_ans[i],y_ans[i],(0,255,0),line_thickness)  
 
     for i in range(0,len(x)):
         if int(y[i]) >= height-1 or int(y[i]) <= 0 or \

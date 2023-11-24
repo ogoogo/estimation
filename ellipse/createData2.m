@@ -14,7 +14,7 @@ m = M;
 data = zeros(2,rows2);
 for i = 1:rows2
     r_correct = m(i,42:44);
-    r_estimate = m(i,72:74);
+    r_estimate = m(i,96:98);
     radError = acos(dot(r_correct,r_estimate)/(norm(r_correct)*norm(r_estimate)));
 %     disp(radError)
 % 角度誤差
@@ -69,10 +69,26 @@ for i = 1:rows2
     radError2 = acos(dot(l_equ_c,l_equ_e)/(norm(l_equ_c)*norm(l_equ_e)));
     data(12,i) = rad2deg(radError2);
 
-% サンセンサずらした角度
-    data(13,i) = m(i,12);
-%     計算時間
-%     data(14,i) = m(i,75);
+%     川端先生図の座標(x,y)
+    coordinate = transform_coordinates([0,0,0],l_cele,l_equ_c);
+    data(13:14,i) = coordinate';
+%     絶対値誤差
+    l_equ_e_wearth = m(i,99:101);
+    error = l_equ_e_wearth - l_equ_c;
+    abserror = norm(error);
+    data(15,i) = abserror;
+%     角度誤差新(全体)
+    radError3 = acos(dot(l_equ_c,l_equ_e_wearth)/(norm(l_equ_c)*norm(l_equ_e_wearth)));
+    data(16,i) = rad2deg(radError3);
+
+
+    r_correct_e = m(i,87:89);
+    r_estimate_e = m(i,102:104);
+    radError_e = acos(dot(r_correct_e,r_estimate_e)/(norm(r_correct_e)*norm(r_estimate_e)));
+%     disp(radError)
+% 角度誤差(地球)
+    data(17,i) = rad2deg(radError_e);
+
 end
 
 

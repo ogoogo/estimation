@@ -1,11 +1,12 @@
 import main_christian_function
 import main_christian_function_build
+import main_christian_function_build_zernike
 import time
 import numpy as np
 import r2e
 
-date = "1118_ras"
-ID =3
+date = "1118_mac"
+ID =4
 focus = 50
 start = time.time()
 # fitz
@@ -15,9 +16,9 @@ start = time.time()
 # r,f = main_christian_function_build.main_christian(ID,date,"slsqp",0,focus,np.zeros(6))
 
 # b
-r,f = main_christian_function_build.main_christian(ID,date,"slsqp",0,focus,np.zeros(6))
+r,f = main_christian_function_build_zernike.main_christian(ID,date,"slsqp",0,focus,np.zeros(6))
 e = r2e.r2e(r)
-r,f = main_christian_function_build.main_christian(ID,date,"slsqp",e,focus,np.zeros(6))
+r,f = main_christian_function_build_zernike.main_christian(ID,date,"slsqp",e,focus,np.zeros(6))
 
 
 end = time.time()
